@@ -35,17 +35,12 @@ const Header = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Close mobile menu when clicking on a link
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      const handleRouteChange = () => setIsMobileMenuOpen(false);
-      window.addEventListener('popstate', handleRouteChange);
-      return () => window.removeEventListener('popstate', handleRouteChange);
-    }
-  }, [isMobileMenuOpen]);
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   if (isLoading) {
-    return null; // Or return a loading spinner
+    return null;
   }
 
   return (
@@ -57,18 +52,8 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="desktop-nav">
-          <ul className="nav-links">
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/groups">Groups</Link></li>
-            <li><Link to="/expenses">Expenses</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
-          </ul>
-        </nav>
-
-        {/* Auth Buttons - Desktop */}
-        <div className="auth-buttons">
+        {/* Desktop Auth Buttons */}
+        <div className="desktop-auth">
           {isAuthenticated ? (
             <div className="user-menu">
               <button 
@@ -81,10 +66,9 @@ const Header = () => {
                   className="user-avatar"
                 />
               </button>
-              <div className="dropdown-menu">
-                <Link to="/profile">Profile</Link>
-                <button onClick={handleLogout}>Log Out</button>
-              </div>
+              <button className="logout-button" onClick={handleLogout}>
+                Log Out
+              </button>
             </div>
           ) : (
             <>
@@ -98,65 +82,49 @@ const Header = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Hamburger Menu Button */}
         <button 
-          className="mobile-menu-button"
+          className="hamburger-button"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
-          <span className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}></span>
+          <div className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </button>
       </div>
 
       {/* Mobile Navigation */}
       <div className={`mobile-nav ${isMobileMenuOpen ? 'open' : ''}`}>
-        <nav>
+        <nav className="mobile-nav-content">
           <ul className="mobile-nav-links">
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/groups">Groups</Link></li>
-            <li><Link to="/expenses">Expenses</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
-          </ul>
-
-          <div className="mobile-auth-buttons">
             {isAuthenticated ? (
               <>
-                <Link 
-                  to="/profile" 
-                  className="mobile-profile-link"
-                  onClick={toggleMobileMenu}
-                >
-                  <img 
-                    src={user?.picture || '/default-avatar.png'} 
-                    alt="User Avatar" 
-                    className="mobile-user-avatar"
-                  />
-                  <span>Profile</span>
-                </Link>
-                <button 
-                  className="mobile-logout-button"
-                  onClick={handleLogout}
-                >
-                  Log Out
-                </button>
+                <li><Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link></li>
+                <li><Link to="/profile" onClick={closeMobileMenu}>Profile</Link></li>
+                <li><button onClick={handleLogout} className="mobile-logout">Log Out</button></li>
               </>
             ) : (
               <>
-                <button 
-                  className="mobile-login-button"
-                  onClick={handleLogin}
-                >
-                  Log In
-                </button>
-                <button 
-                  className="mobile-signup-button"
-                  onClick={handleSignUp}
-                >
-                  Sign Up
-                </button>
+                <li><Link to="/" onClick={closeMobileMenu}>Home</Link></li>
               </>
             )}
-          </div>
+          </ul>
+          
+          {!isAuthenticated && (
+            <div className="mobile-auth-section">
+              <div className="mobile-auth-buttons">
+                <button className="login-button" onClick={() => { handleLogin(); closeMobileMenu(); }}>
+                  Log In
+                </button>
+                <button className="signup-button" onClick={() => { handleSignUp(); closeMobileMenu(); }}>
+                  Sign Up
+                </button>
+              </div>
+            </div>
+          )}
         </nav>
       </div>
     </header>

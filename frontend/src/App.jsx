@@ -8,7 +8,7 @@ import SignUp from './SignUp/SignUp';
 import Home from './Home/Home';
 import ProtectedRoute from './ProtectedRoute';
 
-import './App.css';
+// import './App.css'; // Commented out - styling pages individually
 
 const App = () => {
   const domain = import.meta.env.VITE_AUTH0_DOMAIN;
