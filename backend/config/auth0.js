@@ -1,4 +1,4 @@
-const { ManagementClient } = require('@auth0/auth0-node');
+const { ManagementClient } = require('auth0');
 
 const auth0 = new ManagementClient({
   domain: process.env.AUTH0_DOMAIN,

@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Auth0Provider } from '@auth0/auth0-react';
+import Header from './Header/Header';
+import Dashboard from './Dashboard/Dashboard';
+import Profile from './Profile/Profile';
+import Login from './Login/Login';
+import SignUp from './SignUp/SignUp';
+import Home from './Home/Home';
+import ProtectedRoute from './ProtectedRoute';
 
-function App() {
-  const [count, setCount] = useState(0)
+import './App.css';
+
+const App = () => {
+  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+  const audience = import.meta.env.VITE_AUTH0_AUDIENCE;
+
+  if (!domain || !clientId || !audience) {
+    return <div className="config-error">
+      Missing Auth0 configuration. Please check your environment variables.
+    </div>;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Auth0Provider
+      domain={domain}
+      clientId={clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: audience
+      }}
+      cacheLocation="localstorage"
+    >
+      <Router>
+        <div className="app-container">
+          <Header />
+          <main className="main-content">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
 
-export default App
+              {/* Protected Routes */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+
+              {/* 404 Page */}
+              <Route path="*" element={<div>404 - Page Not Found</div>} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </Auth0Provider>
+  );
+};
+
+export default App;

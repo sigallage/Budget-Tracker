@@ -1,37 +1,48 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 const { checkJwt, getUserFromToken } = require('../middlewares/authMiddleware');
 const User = require('../models/User');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
-// Configure multer for file uploads
+// Ensure uploads directory exists
+const avatarsDir = path.join(__dirname, '../uploads/avatars');
+if (!fs.existsSync(avatarsDir)) {
+  fs.mkdirSync(avatarsDir, { recursive: true });
+}
+
+// Configure multer storage
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, '../uploads/avatars');
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, req.user.dbUser._id + '-' + uniqueSuffix + path.extname(file.originalname));
+  destination: avatarsDir,
+  filename: (req, file, cb) => {
+    const userId = req.user.dbUser._id;
+    const ext = path.extname(file.originalname);
+    const filename = `avatar-${userId}${ext}`;
+    cb(null, filename);
   }
 });
 
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
+// File filter for images only
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
   }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
+
+// Helper function to construct avatar URL
+const getAvatarUrl = (req, filename) => {
+  if (!filename) return null;
+  return `${req.protocol}://${req.get('host')}/uploads/avatars/${filename}`;
+};
 
 // @desc    Get user profile
 // @route   GET /api/profile
@@ -45,10 +56,7 @@ router.get('/', checkJwt, getUserFromToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Construct avatar URL
-    const avatarUrl = user.avatar 
-      ? `/avatars/${path.basename(user.avatar)}`
-      : null;
+    const avatarUrl = user.avatar ? getAvatarUrl(req, path.basename(user.avatar)) : null;
 
     res.json({
       ...user.toObject(),
@@ -80,7 +88,16 @@ router.put(
 
       // Handle avatar upload
       if (req.file) {
-        updateData.avatar = req.file.path;
+        // Delete old avatar if exists
+        const user = await User.findById(req.user.dbUser._id);
+        if (user.avatar) {
+          const oldAvatarPath = path.join(avatarsDir, path.basename(user.avatar));
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+          }
+        }
+        
+        updateData.avatar = req.file.filename;
       }
 
       const updatedUser = await User.findByIdAndUpdate(
@@ -89,10 +106,7 @@ router.put(
         { new: true }
       ).select('-__v -createdAt -updatedAt');
 
-      // Construct avatar URL
-      const avatarUrl = updatedUser.avatar 
-        ? `/avatars/${path.basename(updatedUser.avatar)}`
-        : null;
+      const avatarUrl = updatedUser.avatar ? getAvatarUrl(req, updatedUser.avatar) : null;
 
       res.json({
         ...updatedUser.toObject(),
@@ -104,8 +118,5 @@ router.put(
     }
   }
 );
-
-// Serve avatar images
-router.use('/avatars', express.static(path.join(__dirname, '../uploads/avatars')));
 
 module.exports = router;

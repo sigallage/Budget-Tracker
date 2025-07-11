@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const auth0 = require('../config/auth0');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Handle Auth0 callback and create/update user in MongoDB
 router.post('/callback', async (req, res) => {
