@@ -31,9 +31,14 @@ const Home = () => {
               </Link>
             </>
           ) : (
-            <Link to="/dashboard" className="cta-button cta-primary">
-              Go to Dashboard
-            </Link>
+            <>
+              <Link to="/groups" className="cta-button cta-primary">
+                Go to Groups
+              </Link>
+              <Link to="/calendar" className="cta-button cta-secondary">
+                View Calendar
+              </Link>
+            </>
           )}
         </div>
         

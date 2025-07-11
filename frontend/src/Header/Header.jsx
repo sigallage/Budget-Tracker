@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import './Header.css';
 
@@ -13,6 +13,17 @@ const Header = () => {
   } = useAuth0();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActiveRoute = (path) => {
+    if (path === '/groups') {
+      return location.pathname === '/groups' || location.pathname.startsWith('/groups/');
+    }
+    if (path === '/calendar') {
+      return location.pathname === '/calendar' || location.pathname.includes('/calendar');
+    }
+    return location.pathname === path;
+  };
 
   const handleLogin = () => {
     loginWithRedirect({
@@ -51,6 +62,24 @@ const Header = () => {
             <span className="logo">BudgetTracker</span>
           </Link>
         </div>
+
+        {/* Desktop Navigation */}
+        {isAuthenticated && (
+          <nav className="desktop-nav">
+            <Link 
+              to="/groups" 
+              className={`nav-link ${isActiveRoute('/groups') ? 'active' : ''}`}
+            >
+              Groups
+            </Link>
+            <Link 
+              to="/calendar" 
+              className={`nav-link ${isActiveRoute('/calendar') ? 'active' : ''}`}
+            >
+              Calendar
+            </Link>
+          </nav>
+        )}
 
         {/* Desktop Auth Buttons */}
         <div className="desktop-auth">
@@ -102,13 +131,38 @@ const Header = () => {
           <ul className="mobile-nav-links">
             {isAuthenticated ? (
               <>
-                <li><Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link></li>
-                <li><Link to="/profile" onClick={closeMobileMenu}>Profile</Link></li>
-                <li><button onClick={handleLogout} className="mobile-logout">Log Out</button></li>
+                <li className="nav-section">
+                  <span className="nav-section-title">Navigation</span>
+                </li>
+                <li><Link to="/groups" onClick={closeMobileMenu}>
+                  <span className="nav-icon">👥</span>
+                  Groups
+                </Link></li>
+                <li><Link to="/calendar" onClick={closeMobileMenu}>
+                  <span className="nav-icon">📅</span>
+                  Calendar
+                </Link></li>
+                
+                <li className="nav-divider"></li>
+                
+                <li className="nav-section">
+                  <span className="nav-section-title">Account</span>
+                </li>
+                <li><Link to="/profile" onClick={closeMobileMenu}>
+                  <span className="nav-icon">👤</span>
+                  Profile
+                </Link></li>
+                <li><button onClick={handleLogout} className="mobile-logout">
+                  <span className="nav-icon">🚪</span>
+                  Log Out
+                </button></li>
               </>
             ) : (
               <>
-                <li><Link to="/" onClick={closeMobileMenu}>Home</Link></li>
+                <li><Link to="/" onClick={closeMobileMenu}>
+                  <span className="nav-icon">🏠</span>
+                  Home
+                </Link></li>
               </>
             )}
           </ul>

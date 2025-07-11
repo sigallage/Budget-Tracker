@@ -6,6 +6,11 @@ import Profile from './Profile/Profile';
 import Login from './Login/Login';
 import SignUp from './SignUp/SignUp';
 import Home from './Home/Home';
+import Groups from './Groups/Groups';
+// import GroupsTest from './Groups/GroupsTest'; // Temporary test component
+import AddExpense from './AddExpense/AddExpense';
+import GroupDashboard from './GroupDashboard/GroupDashboard';
+import Calendar from './Calendar/Calendar';
 import ProtectedRoute from './ProtectedRoute';
 
 // import './App.css'; // Commented out - styling pages individually
@@ -55,6 +60,46 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups" 
+                element={
+                  <ProtectedRoute>
+                    <Groups />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups/:groupId" 
+                element={
+                  <ProtectedRoute>
+                    <GroupDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups/:groupId/add-expense" 
+                element={
+                  <ProtectedRoute>
+                    <AddExpense />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups/:groupId/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
                   </ProtectedRoute>
                 } 
               />
