@@ -12,8 +12,8 @@ const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
+const groupRoutes = require('./routes/groupRoutes');
 // Future routes for budget features
-//const groupRoutes = require('./routes/groupRoutes');
 
 // Import middleware
 //const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
@@ -102,9 +102,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api', expenseRoutes);
+app.use('/api', groupRoutes);
 
 // Future budget feature routes
-//app.use('/api/groups', groupRoutes);
 
 // Catch-all for undefined API routes
 app.all('/api/*', (req, res) => {
@@ -112,7 +112,7 @@ app.all('/api/*', (req, res) => {
     error: 'API endpoint not found',
     method: req.method,
     path: req.path,
-    availableEndpoints: ['/api/auth', '/api/dashboard', '/api/profile', '/api/expenses', '/api/health']
+    availableEndpoints: ['/api/auth', '/api/dashboard', '/api/profile', '/api/expenses', '/api/groups', '/api/health']
   });
 });
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import expenseService from '../services/expenseService';
 import './AddExpense.css';
 
@@ -41,23 +42,28 @@ const AddExpense = () => {
 
   const fetchGroupMembers = async () => {
     try {
-      // For now, using mock data since backend group endpoints aren't ready
-      // TODO: Replace with actual API call when group endpoints are implemented
+      const token = await getAccessTokenSilently();
+      const response = await axios.get(`http://localhost:5000/api/groups/${groupId}/members`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setGroupMembers(response.data);
+      
+      // Set current user as default payer
+      const currentUser = response.data.find(member => member.isCurrentUser);
+      if (currentUser) {
+        setExpense(prev => ({ ...prev, paidBy: currentUser.id }));
+      }
+    } catch (error) {
+      console.error('Error fetching group members:', error);
+      // Fallback to mock data for development
       const mockMembers = [
         { id: 'user1', name: 'John Doe', email: 'john@example.com', isCurrentUser: true },
         { id: 'user2', name: 'Jane Smith', email: 'jane@example.com', isCurrentUser: false },
         { id: 'user3', name: 'Bob Johnson', email: 'bob@example.com', isCurrentUser: false },
         { id: 'user4', name: 'Alice Brown', email: 'alice@example.com', isCurrentUser: false }
       ];
-      
       setGroupMembers(mockMembers);
-      // Set current user as default payer
-      const currentUser = mockMembers.find(member => member.isCurrentUser);
-      if (currentUser) {
-        setExpense(prev => ({ ...prev, paidBy: currentUser.id }));
-      }
-    } catch (error) {
-      console.error('Error fetching group members:', error);
+      setExpense(prev => ({ ...prev, paidBy: 'user1' }));
     } finally {
       setLoading(false);
     }

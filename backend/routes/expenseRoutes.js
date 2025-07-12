@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middlewares/authMiddleware');
+const { checkJwt } = require('../middlewares/authMiddleware');
 const Expense = require('../models/Expense');
 const Group = require('../models/Group');
 const User = require('../models/User');
 
 // Get all expenses for a group
-router.get('/groups/:groupId/expenses', authenticateToken, async (req, res) => {
+router.get('/groups/:groupId/expenses', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
@@ -30,7 +30,7 @@ router.get('/groups/:groupId/expenses', authenticateToken, async (req, res) => {
 });
 
 // Create a new expense
-router.post('/groups/:groupId/expenses', authenticateToken, async (req, res) => {
+router.post('/groups/:groupId/expenses', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
@@ -119,7 +119,7 @@ router.post('/groups/:groupId/expenses', authenticateToken, async (req, res) => 
 });
 
 // Update an expense
-router.put('/expenses/:expenseId', authenticateToken, async (req, res) => {
+router.put('/expenses/:expenseId', checkJwt, async (req, res) => {
   try {
     const { expenseId } = req.params;
     const userId = req.user.sub;
@@ -154,7 +154,7 @@ router.put('/expenses/:expenseId', authenticateToken, async (req, res) => {
 });
 
 // Delete an expense
-router.delete('/expenses/:expenseId', authenticateToken, async (req, res) => {
+router.delete('/expenses/:expenseId', checkJwt, async (req, res) => {
   try {
     const { expenseId } = req.params;
     const userId = req.user.sub;
@@ -181,7 +181,7 @@ router.delete('/expenses/:expenseId', authenticateToken, async (req, res) => {
 });
 
 // Settle a split expense
-router.put('/expenses/:expenseId/settle', authenticateToken, async (req, res) => {
+router.put('/expenses/:expenseId/settle', checkJwt, async (req, res) => {
   try {
     const { expenseId } = req.params;
     const userId = req.user.sub;
@@ -215,7 +215,7 @@ router.put('/expenses/:expenseId/settle', authenticateToken, async (req, res) =>
 });
 
 // Get expense statistics for a group
-router.get('/groups/:groupId/expenses/stats', authenticateToken, async (req, res) => {
+router.get('/groups/:groupId/expenses/stats', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
