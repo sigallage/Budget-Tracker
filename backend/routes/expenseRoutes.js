@@ -18,8 +18,6 @@ router.get('/groups/:groupId/expenses', checkJwt, async (req, res) => {
     }
 
     const expenses = await Expense.find({ groupId })
-      .populate('paidBy', 'name email picture')
-      .populate('splitWith.user', 'name email picture')
       .sort({ date: -1 });
 
     res.json(expenses);
@@ -106,12 +104,7 @@ router.post('/groups/:groupId/expenses', checkJwt, async (req, res) => {
     const expense = new Expense(expenseData);
     await expense.save();
 
-    // Populate the saved expense for response
-    const populatedExpense = await Expense.findById(expense._id)
-      .populate('paidBy', 'name email picture')
-      .populate('splitWith.user', 'name email picture');
-
-    res.status(201).json(populatedExpense);
+    res.status(201).json(expense);
   } catch (error) {
     console.error('Error creating expense:', error);
     res.status(500).json({ error: 'Failed to create expense' });
@@ -142,11 +135,7 @@ router.put('/expenses/:expenseId', checkJwt, async (req, res) => {
     Object.assign(expense, updates);
     await expense.save();
 
-    const updatedExpense = await Expense.findById(expense._id)
-      .populate('paidBy', 'name email picture')
-      .populate('splitWith.user', 'name email picture');
-
-    res.json(updatedExpense);
+    res.json(expense);
   } catch (error) {
     console.error('Error updating expense:', error);
     res.status(500).json({ error: 'Failed to update expense' });

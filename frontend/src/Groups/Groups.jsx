@@ -19,16 +19,14 @@ const Groups = () => {
   const [joinCode, setJoinCode] = useState('');
 
   useEffect(() => {
-    // Temporarily disable API call for debugging
     console.log('Groups component mounted');
-    setLoading(false); // Just stop loading without API call
-    // fetchGroups(); // Comment out API call temporarily
+    fetchGroups(); // Re-enable API call
   }, []);
 
   const fetchGroups = async () => {
     try {
       const token = await getAccessTokenSilently();
-      const response = await axios.get('/api/groups', {
+      const response = await axios.get('http://localhost:5000/api/groups', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGroups(response.data);
@@ -45,7 +43,7 @@ const Groups = () => {
     e.preventDefault();
     try {
       const token = await getAccessTokenSilently();
-      const response = await axios.post('/api/groups', newGroup, {
+      const response = await axios.post('http://localhost:5000/api/groups', newGroup, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGroups([...groups, response.data]);
@@ -61,7 +59,7 @@ const Groups = () => {
     e.preventDefault();
     try {
       const token = await getAccessTokenSilently();
-      const response = await axios.post('/api/groups/join', 
+      const response = await axios.post('http://localhost:5000/api/groups/join', 
         { inviteCode: joinCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -118,7 +116,7 @@ const Groups = () => {
       ) : (
         <div className="groups-grid">
           {groups.map(group => (
-            <div key={group.id} className="group-card">
+            <div key={group._id || group.id} className="group-card">
               <div className="group-header">
                 <h3>{group.name}</h3>
                 <span className={`group-type ${group.type}`}>
@@ -142,13 +140,13 @@ const Groups = () => {
               </div>
               <div className="group-actions">
                 <Link 
-                  to={`/groups/${group.id}`} 
+                  to={`/groups/${group._id || group.id}`} 
                   className="btn-primary"
                 >
                   View Group
                 </Link>
                 <Link 
-                  to={`/groups/${group.id}/add-expense`} 
+                  to={`/groups/${group._id || group.id}/add-expense`} 
                   className="btn-secondary"
                 >
                   Add Expense

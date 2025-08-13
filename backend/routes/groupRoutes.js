@@ -14,12 +14,34 @@ router.post('/groups', checkJwt, async (req, res) => {
       return res.status(400).json({ error: 'Group name is required' });
     }
 
+    // Generate a unique invite code
+    const generateInviteCode = () => {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < 8; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    };
+
+    let inviteCode;
+    let isUnique = false;
+    
+    while (!isUnique) {
+      inviteCode = generateInviteCode();
+      const existing = await Group.findOne({ inviteCode });
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+
     const group = new Group({
       name: name.trim(),
       description: description?.trim() || '',
       type: type || 'other',
       createdBy: userId,
-      members: [userId]
+      members: [userId],
+      inviteCode: inviteCode
     });
 
     await group.save();
