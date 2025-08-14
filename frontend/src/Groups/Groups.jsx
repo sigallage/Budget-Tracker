@@ -17,11 +17,31 @@ const Groups = () => {
     type: 'family' // family, friends, roommates, other
   });
   const [joinCode, setJoinCode] = useState('');
+  const [copiedCode, setCopiedCode] = useState(null);
 
   useEffect(() => {
     console.log('Groups component mounted');
     fetchGroups(); // Re-enable API call
   }, []);
+
+  const copyInviteCode = async (inviteCode) => {
+    try {
+      await navigator.clipboard.writeText(inviteCode);
+      setCopiedCode(inviteCode);
+      setTimeout(() => setCopiedCode(null), 2000); // Reset after 2 seconds
+    } catch (error) {
+      console.error('Failed to copy invite code:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = inviteCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedCode(inviteCode);
+      setTimeout(() => setCopiedCode(null), 2000);
+    }
+  };
 
   const fetchGroups = async () => {
     try {
@@ -124,6 +144,22 @@ const Groups = () => {
                 </span>
               </div>
               <p className="group-description">{group.description}</p>
+              
+              {/* Invite Code Section */}
+              <div className="invite-code-section">
+                <div className="invite-code-label">Invite Code:</div>
+                <div className="invite-code-container">
+                  <span className="invite-code">{group.inviteCode}</span>
+                  <button 
+                    className={`copy-btn ${copiedCode === group.inviteCode ? 'copied' : ''}`}
+                    onClick={() => copyInviteCode(group.inviteCode)}
+                    title="Copy invite code"
+                  >
+                    {copiedCode === group.inviteCode ? '✓' : '📋'}
+                  </button>
+                </div>
+              </div>
+              
               <div className="group-stats">
                 <div className="stat">
                   <span className="stat-value">{group.memberCount}</span>

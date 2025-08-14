@@ -125,6 +125,8 @@
 .cta-primary:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+  color: #ffffff;
+  background: linear-gradient(45deg, #7c3aed, #8b5cf6);
 }
 
 .cta-secondary {
@@ -138,6 +140,8 @@
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-3px);
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 /* Features Section */
