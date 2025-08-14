@@ -114,12 +114,12 @@ const GroupDashboard = () => {
           >
             📅 Calendar
           </Link>
-          <Link 
-            to={`/groups/${groupId}/members`} 
+          <button 
             className="btn-secondary"
+            onClick={() => setActiveTab('members')}
           >
             👥 Members
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -150,6 +150,12 @@ const GroupDashboard = () => {
           onClick={() => setActiveTab('balances')}
         >
           Balances
+        </button>
+        <button 
+          className={activeTab === 'members' ? 'active' : ''}
+          onClick={() => setActiveTab('members')}
+        >
+          Members
         </button>
         <button 
           className={activeTab === 'summary' ? 'active' : ''}
@@ -276,6 +282,87 @@ const GroupDashboard = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'members' && (
+        <div className="members-section">
+          <div className="section-header">
+            <h2>Group Members</h2>
+            <div className="expense-stats">
+              <div className="stat">
+                <span className="stat-value">{groupData.members?.length || 0}</span>
+                <span className="stat-label">Total Members</span>
+              </div>
+              <div className="stat">
+                <span className="stat-value">{groupData.inviteCode}</span>
+                <span className="stat-label">Invite Code</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="members-grid">
+            {groupData.members?.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">👥</div>
+                <h3>No members yet</h3>
+                <p>Invite friends and family to join this group</p>
+              </div>
+            ) : (
+              groupData.members?.map(member => (
+                <div key={member.id || member._id} className="member-card">
+                  <div className="member-header">
+                    <div className="member-avatar-large">
+                      {member.picture ? (
+                        <img 
+                          src={member.picture} 
+                          alt={member.name || 'Member'}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : (
+                        <span>
+                          {(member.name || member.email || 'U').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="member-basic-info">
+                      <h3>{member.name || member.email || 'Unknown User'}</h3>
+                      <p className="member-email">{member.email || ''}</p>
+                      <span className={`member-role-badge ${member.isOwner ? 'owner' : 'member'}`}>
+                        {member.isOwner ? 'Owner' : 'Member'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="member-stats">
+                    <div className="member-stat">
+                      <span className="member-stat-value">${(member.totalPaid || 0).toFixed(2)}</span>
+                      <span className="member-stat-label">Paid</span>
+                    </div>
+                    <div className="member-stat">
+                      <span className="member-stat-value">${(member.totalOwed || 0).toFixed(2)}</span>
+                      <span className="member-stat-label">Owes</span>
+                    </div>
+                  </div>
+                  
+                  <div className={`member-balance ${
+                    (member.netBalance || 0) > 0 ? 'positive' : 
+                    (member.netBalance || 0) < 0 ? 'negative' : 'neutral'
+                  }`}>
+                    <span className="member-balance-label">Net Balance</span>
+                    <span className="member-balance-amount">
+                      ${Math.abs(member.netBalance || 0).toFixed(2)}
+                      {(member.netBalance || 0) > 0 && ' (owed)'}
+                      {(member.netBalance || 0) < 0 && ' (owes)'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

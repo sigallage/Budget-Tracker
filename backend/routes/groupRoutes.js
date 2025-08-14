@@ -80,7 +80,44 @@ router.get('/:groupId', checkJwt, async (req, res) => {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    res.json(group);
+    // Fetch member details from User collection
+    const memberDetails = await Promise.all(
+      group.members.map(async (memberId) => {
+        try {
+          const user = await User.findOne({ auth0Id: memberId });
+          return {
+            id: memberId,
+            name: user?.name || 'Unknown User',
+            email: user?.email || '',
+            picture: user?.picture || null,
+            isOwner: memberId === group.createdBy,
+            totalPaid: 0, // TODO: Calculate from expenses
+            totalOwed: 0, // TODO: Calculate from expenses
+            netBalance: 0 // TODO: Calculate from expenses
+          };
+        } catch (error) {
+          console.error(`Error fetching user ${memberId}:`, error);
+          return {
+            id: memberId,
+            name: 'Unknown User',
+            email: '',
+            picture: null,
+            isOwner: memberId === group.createdBy,
+            totalPaid: 0,
+            totalOwed: 0,
+            netBalance: 0
+          };
+        }
+      })
+    );
+
+    // Return group data with populated member details
+    const groupWithMembers = {
+      ...group.toObject(),
+      members: memberDetails
+    };
+
+    res.json(groupWithMembers);
   } catch (error) {
     console.error('Error fetching group:', error);
     res.status(500).json({ error: 'Failed to fetch group' });
