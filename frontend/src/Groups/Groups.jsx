@@ -18,6 +18,8 @@ const Groups = () => {
   });
   const [joinCode, setJoinCode] = useState('');
   const [copiedCode, setCopiedCode] = useState(null);
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
 
   useEffect(() => {
     console.log('Groups component mounted');
@@ -61,6 +63,12 @@ const Groups = () => {
 
   const createGroup = async (e) => {
     e.preventDefault();
+    if (!newGroup.name.trim()) {
+      alert('Please enter a group name');
+      return;
+    }
+    
+    setCreateLoading(true);
     try {
       const token = await getAccessTokenSilently();
       const response = await axios.post('http://localhost:5000/api/groups', newGroup, {
@@ -69,26 +77,62 @@ const Groups = () => {
       setGroups([...groups, response.data]);
       setShowCreateForm(false);
       setNewGroup({ name: '', description: '', type: 'family' });
+      alert('Group created successfully!');
     } catch (error) {
       console.error('Error creating group:', error);
-      alert('Cannot create group - backend not connected. This is a demo interface.');
+      if (error.response?.data?.error) {
+        alert(`Error: ${error.response.data.error}`);
+      } else if (error.response?.status === 401) {
+        alert('Authentication error. Please log in again.');
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        alert('Cannot connect to server. Please check if the backend is running.');
+      } else {
+        alert('Failed to create group. Please try again.');
+      }
+    } finally {
+      setCreateLoading(false);
     }
   };
 
   const joinGroup = async (e) => {
     e.preventDefault();
+    if (!joinCode.trim()) {
+      alert('Please enter an invite code');
+      return;
+    }
+    
+    setJoinLoading(true);
     try {
       const token = await getAccessTokenSilently();
       const response = await axios.post('http://localhost:5000/api/groups/join', 
-        { inviteCode: joinCode },
+        { inviteCode: joinCode.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setGroups([...groups, response.data]);
+      
+      // Add the joined group to the list
+      setGroups([...groups, response.data.group]);
       setShowJoinForm(false);
       setJoinCode('');
+      alert(`Successfully joined "${response.data.group.name}"!`);
     } catch (error) {
       console.error('Error joining group:', error);
-      alert('Cannot join group - backend not connected. This is a demo interface.');
+      if (error.response?.data?.error) {
+        alert(`Error: ${error.response.data.error}`);
+      } else if (error.response?.status === 400) {
+        alert('Invalid invite code. Please check and try again.');
+      } else if (error.response?.status === 404) {
+        alert('Group not found. Please check the invite code.');
+      } else if (error.response?.status === 409) {
+        alert('You are already a member of this group.');
+      } else if (error.response?.status === 401) {
+        alert('Authentication error. Please log in again.');
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        alert('Cannot connect to server. Please check if the backend is running.');
+      } else {
+        alert('Failed to join group. Please try again.');
+      }
+    } finally {
+      setJoinLoading(false);
     }
   };
 
@@ -245,8 +289,8 @@ const Groups = () => {
                 <button type="button" onClick={() => setShowCreateForm(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  Create Group
+                <button type="submit" className="btn-primary" disabled={createLoading}>
+                  {createLoading ? 'Creating...' : 'Create Group'}
                 </button>
               </div>
             </form>
@@ -284,8 +328,8 @@ const Groups = () => {
                 <button type="button" onClick={() => setShowJoinForm(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  Join Group
+                <button type="submit" className="btn-primary" disabled={joinLoading}>
+                  {joinLoading ? 'Joining...' : 'Join Group'}
                 </button>
               </div>
             </form>
