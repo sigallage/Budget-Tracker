@@ -105,8 +105,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api', expenseRoutes);
-app.use('/api', groupRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/groups', groupRoutes);
 
 // Future budget feature routes
 

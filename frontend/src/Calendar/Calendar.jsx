@@ -29,7 +29,7 @@ const Calendar = () => {
       const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
       
-      const response = await axios.get(`/api/groups/${groupId}/expenses`, {
+      const response = await axios.get(`/api/expenses/groups/${groupId}/expenses`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           startDate: startDate.toISOString(),

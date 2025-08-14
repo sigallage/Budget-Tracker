@@ -5,7 +5,7 @@ const Group = require('../models/Group');
 const User = require('../models/User');
 
 // Create a new group
-router.post('/groups', checkJwt, async (req, res) => {
+router.post('/', checkJwt, async (req, res) => {
   try {
     const userId = req.user.sub;
     const { name, description, type } = req.body;
@@ -53,7 +53,7 @@ router.post('/groups', checkJwt, async (req, res) => {
 });
 
 // Get user's groups
-router.get('/groups', checkJwt, async (req, res) => {
+router.get('/', checkJwt, async (req, res) => {
   try {
     const userId = req.user.sub;
     
@@ -70,7 +70,7 @@ router.get('/groups', checkJwt, async (req, res) => {
 });
 
 // Get a specific group
-router.get('/groups/:groupId', checkJwt, async (req, res) => {
+router.get('/:groupId', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
@@ -88,7 +88,7 @@ router.get('/groups/:groupId', checkJwt, async (req, res) => {
 });
 
 // Get group members
-router.get('/groups/:groupId/members', checkJwt, async (req, res) => {
+router.get('/:groupId/members', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
@@ -128,7 +128,7 @@ router.get('/groups/:groupId/members', checkJwt, async (req, res) => {
 });
 
 // Join a group by invite code
-router.post('/groups/join', checkJwt, async (req, res) => {
+router.post('/join', checkJwt, async (req, res) => {
   try {
     const userId = req.user.sub;
     const { inviteCode } = req.body;
@@ -157,7 +157,7 @@ router.post('/groups/join', checkJwt, async (req, res) => {
 });
 
 // Update a group
-router.put('/groups/:groupId', checkJwt, async (req, res) => {
+router.put('/:groupId', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;
@@ -184,7 +184,7 @@ router.put('/groups/:groupId', checkJwt, async (req, res) => {
 });
 
 // Delete a group
-router.delete('/groups/:groupId', checkJwt, async (req, res) => {
+router.delete('/:groupId', checkJwt, async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.sub;

@@ -27,7 +27,7 @@ class ExpenseService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await axios.post(
-        `${API_BASE_URL}/groups/${groupId}/expenses`,
+        `${API_BASE_URL}/expenses/groups/${groupId}/expenses`,
         expenseData,
         { headers }
       );
@@ -42,7 +42,7 @@ class ExpenseService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await axios.get(
-        `${API_BASE_URL}/groups/${groupId}/expenses`,
+        `${API_BASE_URL}/expenses/groups/${groupId}/expenses`,
         { headers }
       );
       return response.data;
@@ -100,7 +100,7 @@ class ExpenseService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await axios.get(
-        `${API_BASE_URL}/groups/${groupId}/expenses/stats`,
+        `${API_BASE_URL}/expenses/groups/${groupId}/expenses/stats`,
         { headers }
       );
       return response.data;
