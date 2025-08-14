@@ -26,8 +26,8 @@ const Login = ({ setCurrentUser }) => {
         // 3. Store user data in your frontend state
         setCurrentUser(response.data.user);
         
-        // 4. Redirect to dashboard
-        navigate('/dashboard');
+        // 4. Redirect to charts page
+        navigate('/charts');
         
       } catch (error) {
         console.error('Login failed:', error);

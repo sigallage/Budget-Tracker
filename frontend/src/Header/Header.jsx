@@ -22,6 +22,9 @@ const Header = () => {
     if (path === '/calendar') {
       return location.pathname === '/calendar' || location.pathname.includes('/calendar');
     }
+    if (path === '/charts') {
+      return location.pathname === '/charts';
+    }
     return location.pathname === path;
   };
 
@@ -71,6 +74,12 @@ const Header = () => {
               className={`nav-link ${isActiveRoute('/groups') ? 'active' : ''}`}
             >
               Groups
+            </Link>
+            <Link 
+              to="/charts" 
+              className={`nav-link ${isActiveRoute('/charts') ? 'active' : ''}`}
+            >
+              Charts
             </Link>
             <Link 
               to="/calendar" 
@@ -137,6 +146,10 @@ const Header = () => {
                 <li><Link to="/groups" onClick={closeMobileMenu}>
                   <span className="nav-icon">👥</span>
                   Groups
+                </Link></li>
+                <li><Link to="/charts" onClick={closeMobileMenu}>
+                  <span className="nav-icon">📊</span>
+                  Charts
                 </Link></li>
                 <li><Link to="/calendar" onClick={closeMobileMenu}>
                   <span className="nav-icon">📅</span>

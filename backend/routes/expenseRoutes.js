@@ -266,4 +266,64 @@ router.get('/groups/:groupId/expenses/stats', checkJwt, async (req, res) => {
   }
 });
 
+// Get all expenses for a user across all groups
+router.get('/user', checkJwt, async (req, res) => {
+  try {
+    const userId = req.user.sub;
+    const { period } = req.query;
+
+    // Find all groups user is a member of
+    const userGroups = await Group.find({ members: userId });
+    const groupIds = userGroups.map(group => group._id);
+
+    // Calculate date filter based on period
+    let dateFilter = {};
+    const now = new Date();
+    
+    switch (period) {
+      case 'week':
+        dateFilter = { 
+          date: { 
+            $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) 
+          } 
+        };
+        break;
+      case 'month':
+        dateFilter = { 
+          date: { 
+            $gte: new Date(now.getFullYear(), now.getMonth(), 1) 
+          } 
+        };
+        break;
+      case 'year':
+        dateFilter = { 
+          date: { 
+            $gte: new Date(now.getFullYear(), 0, 1) 
+          } 
+        };
+        break;
+      default:
+        // 'all' or no period - no date filter
+        break;
+    }
+
+    // Find all expenses in user's groups
+    const query = {
+      groupId: { $in: groupIds },
+      ...dateFilter
+    };
+
+    const expenses = await Expense.find(query).sort({ date: -1 });
+
+    res.json({ 
+      expenses,
+      totalGroups: userGroups.length,
+      period: period || 'all'
+    });
+  } catch (error) {
+    console.error('Error fetching user expenses:', error);
+    res.status(500).json({ error: 'Failed to fetch user expenses' });
+  }
+});
+
 module.exports = router;

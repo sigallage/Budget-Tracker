@@ -83,7 +83,7 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development',
     uptime: process.uptime(),
     version: process.env.npm_package_version || '1.0.0'
-  });
+  }); 
 });
 
 // Root endpoint

@@ -32,18 +32,36 @@ const Profile = () => {
         });
         setProfileData(response.data);
         setFormData({
-          name: response.data.name,
-          email: response.data.email,
-          phone: response.data.phone || '',
-          currencyPreference: response.data.currencyPreference || 'USD',
-          notificationPreferences: response.data.notificationPreferences || {
+          name: response.data?.name || '',
+          email: response.data?.email || user?.email || '',
+          phone: response.data?.phone || '',
+          currencyPreference: response.data?.currencyPreference || 'USD',
+          notificationPreferences: response.data?.notificationPreferences || {
             email: true,
             push: true
           }
         });
-        setPreviewAvatar(response.data.picture || '');
+        setPreviewAvatar(response.data?.picture || user?.picture || '');
       } catch (error) {
         console.error('Error fetching profile data:', error);
+        // Set fallback data from Auth0 user object
+        const fallbackData = {
+          name: user?.name || '',
+          email: user?.email || '',
+          picture: user?.picture || ''
+        };
+        setProfileData(fallbackData);
+        setFormData({
+          name: user?.name || '',
+          email: user?.email || '',
+          phone: '',
+          currencyPreference: 'USD',
+          notificationPreferences: {
+            email: true,
+            push: true
+          }
+        });
+        setPreviewAvatar(user?.picture || '');
       } finally {
         setLoading(false);
       }
@@ -269,13 +287,13 @@ const Profile = () => {
           <div className="profile-details">
             <div className="detail-row">
               <span className="detail-label">Name:</span>
-              <span className="detail-value">{profileData.name}</span>
+              <span className="detail-value">{profileData?.name || 'Not set'}</span>
             </div>
             <div className="detail-row">
               <span className="detail-label">Email:</span>
-              <span className="detail-value">{profileData.email}</span>
+              <span className="detail-value">{profileData?.email || 'Not set'}</span>
             </div>
-            {profileData.phone && (
+            {profileData?.phone && (
               <div className="detail-row">
                 <span className="detail-label">Phone:</span>
                 <span className="detail-value">{profileData.phone}</span>
@@ -284,7 +302,7 @@ const Profile = () => {
             <div className="detail-row">
               <span className="detail-label">Currency:</span>
               <span className="detail-value">
-                {profileData.currencyPreference || 'USD'}
+                {profileData?.currencyPreference || 'USD'}
               </span>
             </div>
             <div className="detail-row">

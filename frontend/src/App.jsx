@@ -11,6 +11,7 @@ import Groups from './Groups/Groups';
 import AddExpense from './AddExpense/AddExpense';
 import GroupDashboard from './GroupDashboard/GroupDashboard';
 import Calendar from './Calendar/Calendar';
+import Charts from './Charts/Charts';
 import ProtectedRoute from './ProtectedRoute';
 
 // import './App.css'; // Commented out - styling pages individually
@@ -52,6 +53,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/charts" 
+                element={
+                  <ProtectedRoute>
+                    <Charts />
                   </ProtectedRoute>
                 } 
               />

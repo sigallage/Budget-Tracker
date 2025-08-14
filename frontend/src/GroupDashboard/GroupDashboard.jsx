@@ -20,7 +20,7 @@ const GroupDashboard = () => {
   const fetchGroupData = async () => {
     try {
       const token = await getAccessTokenSilently();
-      const response = await axios.get(`/api/groups/${groupId}`, {
+      const response = await axios.get(`http://localhost:5000/api/groups/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { timeFilter }
       });
@@ -35,7 +35,7 @@ const GroupDashboard = () => {
   const settleBalance = async (memberId) => {
     try {
       const token = await getAccessTokenSilently();
-      await axios.post(`/api/groups/${groupId}/settle`, 
+      await axios.post(`http://localhost:5000/api/groups/${groupId}/settle`, 
         { memberId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -190,7 +190,7 @@ const GroupDashboard = () => {
               </div>
             ) : (
               groupData.expenses?.map(expense => (
-                <div key={expense.id} className="expense-item">
+                <div key={expense._id || expense.id} className="expense-item">
                   <div className="expense-icon">
                     {getExpenseTypeIcon(expense.type)}
                   </div>
@@ -231,7 +231,7 @@ const GroupDashboard = () => {
           <h2>Member Balances</h2>
           <div className="balances-grid">
             {groupData.members?.map(member => (
-              <div key={member.id} className="balance-card">
+              <div key={member._id || member.id} className="balance-card">
                 <div className="member-info">
                   <img 
                     src={member.avatar || '/default-avatar.png'} 
@@ -310,7 +310,7 @@ const GroupDashboard = () => {
               <h3>Recent Activity</h3>
               <div className="activity-list">
                 {groupData.recentActivity?.slice(0, 5).map(activity => (
-                  <div key={activity.id} className="activity-item">
+                  <div key={activity._id || activity.id} className="activity-item">
                     <div className="activity-icon">
                       {getExpenseTypeIcon(activity.type)}
                     </div>
