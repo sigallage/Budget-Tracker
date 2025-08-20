@@ -50,17 +50,21 @@ const getAvatarUrl = (req, filename) => {
 router.get('/', checkJwt, getUserFromToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.dbUser._id)
-      .select('-__v -createdAt -updatedAt');
+      .select('-__v');
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const avatarUrl = user.avatar ? getAvatarUrl(req, path.basename(user.avatar)) : null;
+    // Construct avatar URL if picture exists
+    let pictureUrl = user.picture;
+    if (user.picture && !user.picture.startsWith('http')) {
+      pictureUrl = getAvatarUrl(req, path.basename(user.picture));
+    }
 
     res.json({
       ...user.toObject(),
-      picture: avatarUrl
+      picture: pictureUrl
     });
   } catch (error) {
     console.error('Profile fetch error:', error);
@@ -79,41 +83,70 @@ router.put(
   async (req, res) => {
     try {
       const { name, phone, currencyPreference, notificationPreferences } = req.body;
+      
+      // Prepare update data
       const updateData = {
-        name,
-        phone: phone || null,
-        currencyPreference,
-        notificationPreferences: JSON.parse(notificationPreferences)
+        name: name || '',
+        phone: phone || '',
+        currencyPreference: currencyPreference || 'USD'
       };
+
+      // Parse notification preferences if it's a string
+      if (notificationPreferences) {
+        try {
+          updateData.notificationPreferences = typeof notificationPreferences === 'string' 
+            ? JSON.parse(notificationPreferences) 
+            : notificationPreferences;
+        } catch (e) {
+          console.error('Error parsing notification preferences:', e);
+          updateData.notificationPreferences = { email: true, push: true };
+        }
+      }
 
       // Handle avatar upload
       if (req.file) {
         // Delete old avatar if exists
         const user = await User.findById(req.user.dbUser._id);
-        if (user.avatar) {
-          const oldAvatarPath = path.join(avatarsDir, path.basename(user.avatar));
+        if (user.picture && !user.picture.startsWith('http')) {
+          const oldAvatarPath = path.join(avatarsDir, path.basename(user.picture));
           if (fs.existsSync(oldAvatarPath)) {
-            fs.unlinkSync(oldAvatarPath);
+            try {
+              fs.unlinkSync(oldAvatarPath);
+            } catch (e) {
+              console.error('Error deleting old avatar:', e);
+            }
           }
         }
         
-        updateData.avatar = req.file.filename;
+        updateData.picture = req.file.filename;
       }
 
       const updatedUser = await User.findByIdAndUpdate(
         req.user.dbUser._id,
         updateData,
-        { new: true }
-      ).select('-__v -createdAt -updatedAt');
+        { new: true, runValidators: true }
+      ).select('-__v');
 
-      const avatarUrl = updatedUser.avatar ? getAvatarUrl(req, updatedUser.avatar) : null;
+      // Construct picture URL
+      let pictureUrl = updatedUser.picture;
+      if (updatedUser.picture && !updatedUser.picture.startsWith('http')) {
+        pictureUrl = getAvatarUrl(req, updatedUser.picture);
+      }
 
       res.json({
         ...updatedUser.toObject(),
-        picture: avatarUrl
+        picture: pictureUrl,
+        message: 'Profile updated successfully'
       });
     } catch (error) {
       console.error('Profile update error:', error);
+      
+      // Handle validation errors
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({ error: 'Validation error', details: errors });
+      }
+      
       res.status(500).json({ error: 'Server error' });
     }
   }

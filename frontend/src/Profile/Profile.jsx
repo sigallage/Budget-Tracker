@@ -25,7 +25,7 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         const token = await getAccessTokenSilently();
-        const response = await axios.get('/api/profile', {
+        const response = await axios.get('http://localhost:5000/api/profile', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -102,8 +102,13 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Save button clicked, starting profile update...');
+    
     try {
+      console.log('Getting access token...');
       const token = await getAccessTokenSilently();
+      
+      console.log('Preparing form data...');
       const formDataToSend = new FormData();
       
       // Append regular fields
@@ -115,19 +120,32 @@ const Profile = () => {
       // Append avatar if changed
       if (avatar) {
         formDataToSend.append('avatar', avatar);
+        console.log('Avatar file added to form data');
       }
 
-      const response = await axios.put('/api/profile', formDataToSend, {
+      console.log('Form data prepared:', {
+        name: formData.name,
+        phone: formData.phone,
+        currencyPreference: formData.currencyPreference,
+        notificationPreferences: formData.notificationPreferences
+      });
+
+      console.log('Sending PUT request to /api/profile...');
+      const response = await axios.put('http://localhost:5000/api/profile', formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
 
+      console.log('Profile update successful:', response.data);
       setProfileData(response.data);
       setEditMode(false);
+      alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
+      console.error('Error details:', error.response?.data);
+      alert(`Error updating profile: ${error.response?.data?.error || error.message}`);
     }
   };
 
@@ -224,11 +242,53 @@ const Profile = () => {
                 value={formData.currencyPreference}
                 onChange={handleInputChange}
               >
-                <option value="USD">US Dollar (USD)</option>
-                <option value="EUR">Euro (EUR)</option>
-                <option value="GBP">British Pound (GBP)</option>
-                <option value="INR">Indian Rupee (INR)</option>
-                <option value="JPY">Japanese Yen (JPY)</option>
+                <option value="USD">US Dollar (USD) - $</option>
+                <option value="EUR">Euro (EUR) - €</option>
+                <option value="GBP">British Pound (GBP) - £</option>
+                <option value="JPY">Japanese Yen (JPY) - ¥</option>
+                <option value="CNY">Chinese Yuan (CNY) - ¥</option>
+                <option value="INR">Indian Rupee (INR) - ₹</option>
+                <option value="AUD">Australian Dollar (AUD) - A$</option>
+                <option value="CAD">Canadian Dollar (CAD) - C$</option>
+                <option value="CHF">Swiss Franc (CHF) - Fr</option>
+                <option value="KRW">South Korean Won (KRW) - ₩</option>
+                <option value="SGD">Singapore Dollar (SGD) - S$</option>
+                <option value="HKD">Hong Kong Dollar (HKD) - HK$</option>
+                <option value="SEK">Swedish Krona (SEK) - kr</option>
+                <option value="NOK">Norwegian Krone (NOK) - kr</option>
+                <option value="DKK">Danish Krone (DKK) - kr</option>
+                <option value="PLN">Polish Złoty (PLN) - zł</option>
+                <option value="CZK">Czech Koruna (CZK) - Kč</option>
+                <option value="HUF">Hungarian Forint (HUF) - Ft</option>
+                <option value="RUB">Russian Ruble (RUB) - ₽</option>
+                <option value="TRY">Turkish Lira (TRY) - ₺</option>
+                <option value="BRL">Brazilian Real (BRL) - R$</option>
+                <option value="MXN">Mexican Peso (MXN) - $</option>
+                <option value="ARS">Argentine Peso (ARS) - $</option>
+                <option value="CLP">Chilean Peso (CLP) - $</option>
+                <option value="COP">Colombian Peso (COP) - $</option>
+                <option value="ZAR">South African Rand (ZAR) - R</option>
+                <option value="EGP">Egyptian Pound (EGP) - £</option>
+                <option value="AED">UAE Dirham (AED) - د.إ</option>
+                <option value="SAR">Saudi Riyal (SAR) - ﷼</option>
+                <option value="QAR">Qatari Riyal (QAR) - ﷼</option>
+                <option value="KWD">Kuwaiti Dinar (KWD) - د.ك</option>
+                <option value="BHD">Bahraini Dinar (BHD) - .د.ب</option>
+                <option value="THB">Thai Baht (THB) - ฿</option>
+                <option value="MYR">Malaysian Ringgit (MYR) - RM</option>
+                <option value="IDR">Indonesian Rupiah (IDR) - Rp</option>
+                <option value="PHP">Philippine Peso (PHP) - ₱</option>
+                <option value="VND">Vietnamese Dong (VND) - ₫</option>
+                <option value="TWD">Taiwan Dollar (TWD) - NT$</option>
+                <option value="NZD">New Zealand Dollar (NZD) - NZ$</option>
+                <option value="ILS">Israeli Shekel (ILS) - ₪</option>
+                <option value="PKR">Pakistani Rupee (PKR) - ₨</option>
+                <option value="BDT">Bangladeshi Taka (BDT) - ৳</option>
+                <option value="LKR">Sri Lankan Rupee (LKR) - ₨</option>
+                <option value="NPR">Nepalese Rupee (NPR) - ₨</option>
+                <option value="MMK">Myanmar Kyat (MMK) - K</option>
+                <option value="KHR">Cambodian Riel (KHR) - ៛</option>
+                <option value="LAK">Lao Kip (LAK) - ₭</option>
               </select>
             </div>
 

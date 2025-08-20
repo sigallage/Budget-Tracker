@@ -52,7 +52,6 @@ const groupSchema = new mongoose.Schema({
 });
 
 // Index for better query performance
-groupSchema.index({ inviteCode: 1 });
 groupSchema.index({ createdBy: 1 });
 groupSchema.index({ members: 1 });
 
