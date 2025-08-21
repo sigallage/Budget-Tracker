@@ -13,6 +13,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const incomeRoutes = require('./routes/incomeRoutes');
 // Future routes for budget features
 
 // Import middleware
@@ -96,7 +97,10 @@ app.get('/', (req, res) => {
       health: '/api/health',
       auth: '/api/auth',
       dashboard: '/api/dashboard',
-      profile: '/api/profile'
+      profile: '/api/profile',
+      expenses: '/api/expenses',
+      groups: '/api/groups',
+      income: '/api/income'
     }
   });
 });
@@ -107,6 +111,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/income', incomeRoutes);
 
 // Future budget feature routes
 
@@ -116,7 +121,7 @@ app.all('/api/*', (req, res) => {
     error: 'API endpoint not found',
     method: req.method,
     path: req.path,
-    availableEndpoints: ['/api/auth', '/api/dashboard', '/api/profile', '/api/expenses', '/api/groups', '/api/health']
+    availableEndpoints: ['/api/auth', '/api/dashboard', '/api/profile', '/api/expenses', '/api/groups', '/api/income', '/api/health']
   });
 });
 

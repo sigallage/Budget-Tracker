@@ -25,6 +25,9 @@ const Header = () => {
     if (path === '/charts') {
       return location.pathname === '/charts';
     }
+    if (path === '/income') {
+      return location.pathname === '/income';
+    }
     return location.pathname === path;
   };
 
@@ -80,6 +83,12 @@ const Header = () => {
               className={`nav-link ${isActiveRoute('/charts') ? 'active' : ''}`}
             >
               Charts
+            </Link>
+            <Link 
+              to="/income" 
+              className={`nav-link ${isActiveRoute('/income') ? 'active' : ''}`}
+            >
+              Income
             </Link>
             <Link 
               to="/calendar" 
@@ -150,6 +159,10 @@ const Header = () => {
                 <li><Link to="/charts" onClick={closeMobileMenu}>
                   <span className="nav-icon">📊</span>
                   Charts
+                </Link></li>
+                <li><Link to="/income" onClick={closeMobileMenu}>
+                  <span className="nav-icon">💰</span>
+                  Income
                 </Link></li>
                 <li><Link to="/calendar" onClick={closeMobileMenu}>
                   <span className="nav-icon">📅</span>

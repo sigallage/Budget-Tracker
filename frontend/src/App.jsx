@@ -12,6 +12,7 @@ import AddExpense from './AddExpense/AddExpense';
 import GroupDashboard from './GroupDashboard/GroupDashboard';
 import Calendar from './Calendar/Calendar';
 import Charts from './Charts/Charts';
+import Income from './Income/Income';
 import ProtectedRoute from './ProtectedRoute';
 
 // import './App.css'; // Commented out - styling pages individually
@@ -65,10 +66,26 @@ const App = () => {
                 } 
               />
               <Route 
+                path="/income" 
+                element={
+                  <ProtectedRoute>
+                    <Income />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/profile" 
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups" 
+                element={
+                  <ProtectedRoute>
+                    <Groups />
                   </ProtectedRoute>
                 } 
               />
