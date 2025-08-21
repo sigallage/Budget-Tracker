@@ -3,9 +3,9 @@
 .add-expense-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
-  min-height: calc(100vh - 80px);
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #000000 100%);
+  padding: 80px 2rem 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
 }
 
